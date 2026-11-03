@@ -11,8 +11,8 @@
     "custom-cards"
   ],
   "module": "energy-overview-card.js",
-  "repository": "https://github.com/Sese-Schneider/ha-energy-overview-card",
-  "author": "Sebastian Schneider <sese.tailor@gmx.net>",
+  "repository": "https://github.com/timlaing/ha-energy-overview-card",
+  "author": "Tim Laing <tim@laingcorp.co.uk>",
   "license": "MIT",
   "dependencies": {
     "@mdi/js": "^7.1.96",
@@ -57,5 +57,16 @@
     "build": "npm run lint && rollup -c --bundleConfigAsCjs",
     "lint": "eslint src/*.ts",
     "rollup": "rollup -c"
-  }
+  },
+  "contributors": [
+    {
+      "name": "Sebastian Schneider",
+      "url": "https://github.com/Sese-Schneider"
+    }
+  ],
+  "homepage": "https://github.com/timlaing/ha-energy-overview-card",
+  "bugs": {
+    "url": "https://github.com/timlaing/ha-energy-overview-card/issues"
+  },
+  "private": true
 }

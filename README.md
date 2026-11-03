@@ -1,14 +1,17 @@
-# Energy Overview Card by [@Sese-Schneider](https://www.github.com/Sese-Schneider)
+# Energy Overview Card
 
-A simple card which displays energy usage details of one or multiple entities.
+A Home Assistant dashboard card for live power, voltage, current, frequency and power factor, with animated power flow.
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Sese-Schneider&repository=ha-energy-overview-card&category=frontend)
-[![GitHub Release][releases-shield]][releases]
-![GitHub Downloads][downloads-shield]
+Maintained by [Tim Laing (@timlaing)](https://github.com/timlaing). This fork continues the original work by [Sebastian Schneider (@Sese-Schneider)](https://github.com/Sese-Schneider/ha-energy-overview-card). Thank you to Sebastian for creating the card and making it available under the MIT license. Original history, copyright and release notes are retained.
 
-[![License][license-shield]](LICENSE)
-![Project Maintenance][maintenance-shield]
-[![GitHub Activity][commits-shield]][commits]
+[![CI](https://github.com/timlaing/ha-energy-overview-card/actions/workflows/ci.yml/badge.svg)](https://github.com/timlaing/ha-energy-overview-card/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+## Compatibility
+
+This fork starts from upstream v2.5.0. Compatibility with current Home Assistant releases is being restored and has not yet been verified. The visual editor and narrow layouts have known problems. See [the compatibility issues](https://github.com/timlaing/ha-energy-overview-card/issues) and [release verification tracker #7](https://github.com/timlaing/ha-energy-overview-card/issues/7).
+
+Existing `custom:energy-overview-card` YAML and the `energy-overview-card.js` filename are retained. This repository setup does not change card behavior.
 
 **Features:**
 
@@ -24,12 +27,9 @@ _Three-phase power monitoring example:_
 
 ## Configuration
 
-A graphical user interface (GUI) to configure the card is available.
+A graphical editor is included, but its entity controls are currently broken on recent Home Assistant versions. Use YAML until [issue #1](https://github.com/timlaing/ha-energy-overview-card/issues/1) is resolved.
 
-After installation, simply press "Add Card", search for "Energy Overview", and add the card.
-Now you can start the configuration via the GUI.
-
-Direct configuration via YAML is also available. For details see below.
+After installation, press "Add Card", search for "Energy Overview", and use the YAML editor with the options below.
 
 ## Options
 
@@ -106,35 +106,28 @@ animation:
   max_duration: 10
 ```
 
-## Install
+## Installation
 
 ### HACS
 
-_This repo is available for install through the HACS._
+This fork is a custom repository; it is not currently listed as a HACS default repository. After the first validated fork release is published:
 
-- Go to HACS → Frontend
-- Use the FAB "Explore and download repositories" to search "Energy Overview Card".
+1. Open HACS, select **Custom repositories**, and add `https://github.com/timlaing/ha-energy-overview-card` as a **Dashboard** repository.
+2. Download Energy Overview Card and reload dashboard resources.
+3. Add `custom:energy-overview-card` using the YAML example above.
 
-_or_
+Until that release exists, build the source for development as described in [CONTRIBUTING.md](CONTRIBUTING.md).
 
-Click here:
+### Manual installation
 
-[![](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Sese-Schneider&repository=ha-energy-overview-card&category=frontend)
+After a fork release is available, download `energy-overview-card.js` from [this fork's releases](https://github.com/timlaing/ha-energy-overview-card/releases), copy it to `config/www/`, and register `/local/energy-overview-card.js` as a **JavaScript module** in dashboard resources. Reload the browser after changing resources.
 
-### Simple install
+### Migrating from the original repository
 
-- Download and copy `energy-overview-card.js` from the
-  latest [release](https://github.com/Sese-Schneider/ha-energy-overview-card/releases/latest) into your `config/www`
-  directory.
-- Add a reference to `energy-overview-card.js` as JavaScript-Module to your Lovelace dashboard via "Manage Resources". (
-  Note: You have to enable advanced mode)
+Keep your existing card YAML. Remove the original HACS installation/resource before loading this fork, then install this fork and refresh the browser. Both versions register the same custom element, so load only one copy. Keep a copy of the previous JavaScript file if you need to roll back.
 
-[Troubleshooting](https://github.com/thomasloven/hass-config/wiki/Lovelace-Plugins)
+## Contributing and support
 
-[commits-shield]: https://img.shields.io/github/commit-activity/y/Sese-Schneider/ha-energy-overview-card.svg?style=for-the-badge
-[downloads-shield]: https://img.shields.io/github/downloads/Sese-Schneider/ha-energy-overview-card/total.svg?style=for-the-badge
-[commits]: https://github.com/Sese-Schneider/ha-energy-overview-card/commits/main
-[license-shield]: https://img.shields.io/github/license/Sese-Schneider/ha-energy-overview-card.svg?style=for-the-badge
-[maintenance-shield]: https://img.shields.io/maintenance/yes/2024.svg?style=for-the-badge
-[releases-shield]: https://img.shields.io/github/release/Sese-Schneider/ha-energy-overview-card.svg?style=for-the-badge
-[releases]: https://github.com/Sese-Schneider/ha-energy-overview-card/releases
+Use [this fork's issues](https://github.com/timlaing/ha-energy-overview-card/issues) for bugs and feature requests. Include Home Assistant/frontend and card versions, a minimal YAML example, browser/device details and relevant console errors with secrets removed.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development and releases, [SECURITY.md](SECURITY.md) for private vulnerability reporting, and [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md) for attribution.

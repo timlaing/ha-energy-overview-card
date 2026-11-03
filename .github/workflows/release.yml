@@ -1,35 +1,38 @@
-name: Release
-
-on: workflow_dispatch
-
+name: Release asset
+on:
+  release:
+    types: [published]
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
-  release-bundle:
+  release:
+    name: Build release asset
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
-
-    outputs:
-      new_release_published: ${{ steps.semantic.outputs.new_release_published }}
-      new_release_version: ${{ steps.semantic.outputs.new_release_version }}
-
+    timeout-minutes: 15
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js 18.x
-        uses: actions/setup-node@v2.1.4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: 18.x
-      - name: Cache Node.js modules
-        uses: actions/cache@v2
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          path: ~/.npm # npm cache files are stored in `~/.npm` on Linux/macOS
-          key: ${{ runner.OS }}-node-12.x-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.OS }}-node-12.x
-            ${{ runner.OS }}-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-      - name: Build the project
-        run: npm run build --if-present
-      - name: Release
-        run: npx semantic-release
+          node-version: '24'
+      - run: npm install --global yarn@1.22.22 --ignore-scripts
+      - run: yarn install --frozen-lockfile --ignore-scripts
+      - name: Verify release version and main ancestry
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          node -e 'const p = require("./package.json"); if (process.env.RELEASE_TAG !== "v" + p.version) process.exit(1);'
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+      - run: npm run build
+      - name: Attach card module
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$RELEASE_TAG" dist/energy-overview-card.js --repo "$GITHUB_REPOSITORY" --clobber

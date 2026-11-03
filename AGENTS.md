@@ -1,0 +1,26 @@
+# AGENTS.md
+
+## Project
+
+Maintained fork of Energy Overview Card, owned by @timlaing. Original author: Sebastian Schneider (@Sese-Schneider). Retain the original MIT copyright, history and acknowledgment.
+
+## Scope and compatibility
+
+- Keep `custom:energy-overview-card`, `energy-overview-card.js`, and existing valid YAML options compatible.
+- Source lives in `src/`; generated output lives in `dist/` and is not committed.
+- Prefer small, focused changes linked to issues. Do not change live Home Assistant systems without explicit authorization.
+- Avoid relying on undocumented frontend elements where practical. Verify any internal APIs against the target stable frontend.
+- Test missing/unavailable states, finite animation values, zero/negative power and multiple card instances for affected changes.
+- Check phone, tablet and desktop layouts, light/dark themes, Masonry and Sections for UI changes.
+
+## Development
+
+Use Node 24 and Yarn 1.22.22. Run `yarn install --frozen-lockfile --ignore-scripts`, `npm run lint`, and `npm run build`. The inherited source has no automated test suite or coverage yet; issue #6 tracks this. Do not describe a build as runtime or browser verification.
+
+## Repository conventions
+
+Use Conventional Commit messages and PR titles. Populate `.github/PULL_REQUEST_TEMPLATE.md`, including validation and compatibility details. Keep credentials out of commits and workflow logs. Pin actions to full commit SHAs; grant job-level write permissions only where needed. Never execute pull request code in privileged metadata workflows. Do not rewrite published history or bypass protections without explicit authorization.
+
+## Releases
+
+Follow CONTRIBUTING.md. Releases require explicit maintainer action; a push must not publish. Do not claim current Home Assistant or HACS compatibility until the exact release artifact is tested. Update user documentation when behavior changes.
