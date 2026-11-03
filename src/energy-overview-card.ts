@@ -140,8 +140,9 @@ export class EnergyOverviewCard extends LitElement {
     if (animation.duration === undefined) return nothing;
     const duration = `${animation.duration}s`;
     const direction = animation.inverted ? 'reverse' : 'normal';
+    const motionStyle = `--flow-duration: ${duration}; --flow-direction: ${direction};`;
     return svg`<circle class="grid" cx="0" cy="5" r="1" vector-effect="non-scaling-stroke"
-      style=${`--flow-duration: ${duration}; --flow-direction: ${direction};`}></circle>`;
+      style=${motionStyle}></circle>`;
   }
 
   private _measurement(value: EnergyOverviewEntityState | undefined, name: string) {
