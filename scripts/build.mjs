@@ -1,8 +1,12 @@
 import { build, context } from 'esbuild';
+import { readFile } from 'node:fs/promises';
+
+const license = (await readFile(new URL('../LICENSE', import.meta.url), 'utf8')).trim();
 const options = {
   entryPoints: ['src/energy-overview-card.ts'],
   outfile: 'dist/energy-overview-card.js',
   bundle: true,
+  banner: { js: `/*!\n${license}\n*/` },
   format: 'esm',
   target: 'es2022',
   minify: true,

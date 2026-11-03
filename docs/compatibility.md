@@ -19,6 +19,8 @@ The built module was manually installed under `www/` in two independent, tempora
 | 2026.10.4 | 20260930.5 | Passed the checks below |
 | 2026.11.0b4 | 20261028.3 | Passed the checks below |
 
+The subsequent build-only review fix prepends the full MIT license notice. Removing that comment yields the identical module hash recorded below; no executable code changed.
+
 Browser: Playwright Chromium 156.0.8078.4. Tested module SHA-256: `b5af0b8ae1101a5bc2d5d4d8d072ac6d8a552862941e23ae33d8edf3d758f93a`.
 
 Checks performed on both versions:
