@@ -4,6 +4,14 @@
 
 Maintained fork of Energy Overview Card, owned by @timlaing. Original author: Sebastian Schneider (@Sese-Schneider). Retain the original MIT copyright, history and acknowledgment.
 
+## Repository authority
+
+The original repository, `Sese-Schneider/ha-energy-overview-card`, is no longer maintained. Treat it as a historical reference for the original implementation and attribution.
+
+This repository, `timlaing/ha-energy-overview-card`, is the primary maintained repository and the authoritative source for ongoing development, issues, pull requests, releases, documentation and support. Target this repository for all new work and links. Do not treat the original repository as the current source of truth or direct users there for maintenance.
+
+Preserve Sebastian Schneider's authorship acknowledgment, original MIT copyright and upstream Git history. This fork's authority does not imply ownership of the original author's copyright or endorsement by the original author.
+
 ## Scope and compatibility
 
 - Keep `custom:energy-overview-card`, `energy-overview-card.js`, and existing valid YAML options compatible.
