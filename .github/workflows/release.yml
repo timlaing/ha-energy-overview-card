@@ -31,8 +31,32 @@ jobs:
           node -e 'const p = require("./package.json"); if (process.env.RELEASE_TAG !== "v" + p.version) process.exit(1);'
           git merge-base --is-ancestor "$GITHUB_SHA" origin/main
       - run: npm run build
+      - run: node scripts/validate-hacs-package.mjs
+      - name: Check release module syntax
+        run: node --input-type=module --check < dist/energy-overview-card.js
       - name: Attach card module
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: gh release upload "$RELEASE_TAG" dist/energy-overview-card.js --repo "$GITHUB_REPOSITORY" --clobber
+
+  validate-hacs:
+    name: HACS release validation
+    needs: release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # HACS reads GitHub, so wait until the asset has been uploaded. The
+      # local wrapper pins the image as well as its configuration.
+      - uses: ./.github/actions/hacs
+        env:
+          REPOSITORY_REF: ${{ github.event.release.tag_name }}
+        with:
+          category: plugin
+          ignore: brands
+          comment: false

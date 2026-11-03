@@ -1,19 +1,32 @@
 name: HACS
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
   pull_request:
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   hacs:
-    name: HACS validation
+    name: HACS package validation
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: hacs/action@1ebf01c408f29afcb6406bd431bc98fd8cbb15aa
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          category: plugin
-          ignore: brands
+          node-version: '24'
+      - run: npm install --global yarn@1.22.22 --ignore-scripts
+      - run: yarn install --frozen-lockfile --ignore-scripts
+      - run: npm run build
+      # HACS fetches remote files; dist/ is deliberately uncommitted and no
+      # release exists yet. Check the built package here. Run the full remote
+      # validator only after the release workflow uploads the actual asset.
+      - run: node scripts/validate-hacs-package.mjs
+      - name: Check release module syntax
+        run: node --input-type=module --check < dist/energy-overview-card.js
