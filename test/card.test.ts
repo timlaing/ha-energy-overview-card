@@ -22,7 +22,7 @@ it('renders missing and unavailable states without a motion element', async () =
   const element = await card([{ power: 'sensor.missing', voltage: 'sensor.missing' }, { power: '' }]);
   expect(element.shadowRoot!.textContent).toContain('Not found');
   expect(element.shadowRoot!.textContent).toContain('Not configured');
-  expect(element.shadowRoot!.querySelector('animateMotion')).toBeNull();
+   expect(element.shadowRoot!.querySelector('circle')).toBeNull();
   element.hass = { ...hass, states: { 'sensor.missing': { state: 'unavailable', attributes: {} } } };
   await element.updateComplete;
   expect(element.shadowRoot!.textContent).toContain('unavailable');
@@ -37,15 +37,15 @@ it('renders sensor-derived markup as text', async () => {
 it('preserves motion nodes across updates and uses inline independent paths', async () => {
   const first = await card([{ power: 'sensor.power' }, { power: 'sensor.power' }]);
   const second = await card();
-  const motion = first.shadowRoot!.querySelector('animateMotion');
-  expect(motion?.getAttribute('path')).toBe('M0,5 H100');
+  const motion = first.shadowRoot!.querySelector('circle')!;
+  expect(getComputedStyle(motion).animationDuration).toBe('5.5s');
   expect(motion?.namespaceURI).toBe('http://www.w3.org/2000/svg');
   expect(first.shadowRoot!.querySelector('[id="grid"]')).toBeNull();
   first.hass = { ...hass, states: { 'sensor.power': { state: '-250', attributes: {} } } };
   await first.updateComplete;
-  expect(first.shadowRoot!.querySelector('animateMotion')).toBe(motion);
-  expect(motion?.getAttribute('keyPoints')).toBe('1;0');
-  expect(second.shadowRoot!.querySelector('animateMotion')?.getAttribute('keyPoints')).toBe('0;1');
+  expect(first.shadowRoot!.querySelector('circle')).toBe(motion);
+  expect(getComputedStyle(motion).animationDirection).toBe('reverse');
+  expect(getComputedStyle(second.shadowRoot!.querySelector('circle')!).animationDirection).toBe('normal');
 });
 it.each([180, 320, 768, 1280])('does not overflow a %s px card with long labels and optional metadata', async (width) => {
   const label = 'A very long label with words and unbrokencharacters'.repeat(2);
@@ -60,6 +60,38 @@ it.each([180, 320, 768, 1280])('does not overflow a %s px card with long labels 
   for (const text of element.shadowRoot!.querySelectorAll<HTMLElement>('.name, .label')) {
     expect(text.scrollWidth).toBeLessThanOrEqual(text.clientWidth + 1);
   }
+});
+it.each([320, 768, 1280])('moves across the full flow line at %s px and reverses direction', async (width) => {
+  const element = await card();
+  element.style.width = `${width}px`;
+  const circle = element.shadowRoot!.querySelector('circle')!;
+  const svg = element.shadowRoot!.querySelector('svg')!;
+  const center = () => {
+    const bounds = circle.getBoundingClientRect();
+    return bounds.left + bounds.width / 2;
+  };
+  const animation = circle.getAnimations()[0];
+  expect(animation).toBeDefined();
+  // First prove the clock is running, then sample exact positions without timing races.
+  await expect.poll(() => Number(animation.currentTime)).toBeGreaterThan(0);
+  animation.pause();
+  animation.currentTime = 1375; // 25% of the 5.5s cycle
+  const bounds = svg.getBoundingClientRect();
+  expect(center()).toBeCloseTo(bounds.left + bounds.width * 0.25, 0);
+  animation.currentTime = 4125;
+  expect(center()).toBeCloseTo(bounds.left + bounds.width * 0.75, 0);
+  element.hass = { ...hass, states: { 'sensor.power': { state: '-500', attributes: {} } } };
+  await element.updateComplete;
+  const reversed = circle.getAnimations()[0];
+  reversed.pause();
+  reversed.currentTime = 1375;
+  expect(center()).toBeCloseTo(bounds.left + bounds.width * 0.75, 0);
+  element.hass = { ...hass, states: { 'sensor.power': { state: '0', attributes: {} } } };
+  await element.updateComplete;
+  expect(element.shadowRoot!.querySelector('circle')).toBeNull();
+  element.hass = hass;
+  await element.updateComplete;
+  expect(element.shadowRoot!.querySelector('circle')!.getAnimations()).toHaveLength(1);
 });
 it('supports empty previews, validates shape, and sizes title/rows without clipping Sections', async () => {
   const element = await card([]);

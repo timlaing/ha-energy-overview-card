@@ -33,7 +33,7 @@
 
 ## Unreleased (maintained fork)
 
-_No changes yet._
+- Replace SVG SMIL flow motion with CSS keyframes; verify movement and reversal in Chromium and WebKit. Physical mobile verification remains pending (#10).
 
 ## [2.5.0](https://github.com/Sese-Schneider/ha-energy-overview-card/compare/v2.4.2...v2.5.0) (2023-12-29)
 

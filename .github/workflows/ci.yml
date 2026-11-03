@@ -24,8 +24,9 @@ jobs:
           node-version: '24'
       - run: npm ci --ignore-scripts
       - run: npm run build
-      - name: Install Chromium for browser regression tests
-        run: npx --no-install playwright install --with-deps chromium
+      - name: Install Chromium and WebKit for browser regression tests
+        run: npx --no-install playwright install --with-deps chromium webkit
       - run: npm run test:coverage
+      - run: npm test
       - name: Audit runtime and development dependencies
         run: npm audit --audit-level=moderate
