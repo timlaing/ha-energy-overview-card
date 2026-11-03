@@ -1,6 +1,13 @@
 import { afterEach, expect, it } from 'vitest';
+import { commands } from 'vitest/browser';
 import { EnergyOverviewCard } from '../src/energy-overview-card';
 import type { HomeAssistant } from '../src/ha-types';
+
+declare module 'vitest/browser' {
+  interface BrowserCommands {
+    setReducedMotion(preference: 'reduce' | 'no-preference' | null): Promise<void>;
+  }
+}
 
 const hass: HomeAssistant = {
   states: { 'sensor.power': { state: '500', attributes: { unit_of_measurement: 'W' } } },
@@ -46,6 +53,24 @@ it('preserves motion nodes across updates and uses inline independent paths', as
   expect(first.shadowRoot!.querySelector('circle')).toBe(motion);
   expect(getComputedStyle(motion).animationDirection).toBe('reverse');
   expect(getComputedStyle(second.shadowRoot!.querySelector('circle')!).animationDirection).toBe('normal');
+  await expect.poll(() => second.shadowRoot!.querySelector('circle')!.getAnimations()[0]?.playState).toBe('running');
+});
+it('hides the flow dot and removes its animation when reduced motion is enabled', async () => {
+  try {
+    await commands.setReducedMotion('no-preference');
+    const element = await card();
+    const circle = element.shadowRoot!.querySelector('circle')!;
+    await expect.poll(() => circle.getAnimations()[0]?.playState).toBe('running');
+    await commands.setReducedMotion('reduce');
+    await expect.poll(() => matchMedia('(prefers-reduced-motion: reduce)').matches).toBe(true);
+    await expect.poll(() => getComputedStyle(circle).display).toBe('none');
+    await expect.poll(() => circle.getAnimations().length).toBe(0);
+    await commands.setReducedMotion('no-preference');
+    await expect.poll(() => getComputedStyle(circle).display).not.toBe('none');
+    await expect.poll(() => circle.getAnimations()[0]?.playState).toBe('running');
+  } finally {
+    await commands.setReducedMotion(null);
+  }
 });
 it.each([180, 320, 768, 1280])('does not overflow a %s px card with long labels and optional metadata', async (width) => {
   const label = 'A very long label with words and unbrokencharacters'.repeat(2);

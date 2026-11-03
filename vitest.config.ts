@@ -6,6 +6,11 @@ export default defineConfig(({ mode }) => ({
     browser: {
       enabled: true,
       provider: playwright(),
+      commands: {
+        async setReducedMotion({ page }, preference: 'reduce' | 'no-preference' | null) {
+          await page.emulateMedia({ reducedMotion: preference });
+        },
+      },
       // V8 coverage stays on Chromium; the webkit mode runs separately.
       instances: [{ browser: mode === 'webkit' ? 'webkit' : 'chromium' }],
       headless: true,
