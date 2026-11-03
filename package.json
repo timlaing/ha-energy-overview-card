@@ -68,5 +68,9 @@
   "bugs": {
     "url": "https://github.com/timlaing/ha-energy-overview-card/issues"
   },
-  "private": true
+  "private": true,
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/timlaing"
+  }
 }

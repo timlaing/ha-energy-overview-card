@@ -131,3 +131,5 @@ Keep your existing card YAML. Remove the original HACS installation/resource bef
 Use [this fork's issues](https://github.com/timlaing/ha-energy-overview-card/issues) for bugs and feature requests. Include Home Assistant/frontend and card versions, a minimal YAML example, browser/device details and relevant console errors with secrets removed.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development and releases, [SECURITY.md](SECURITY.md) for private vulnerability reporting, and [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md) for attribution.
+
+Support ongoing maintenance through [GitHub Sponsors (@timlaing)](https://github.com/sponsors/timlaing).
