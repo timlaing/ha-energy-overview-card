@@ -4,18 +4,21 @@ Open an issue in timlaing/ha-energy-overview-card before a substantial change. U
 
 ## Development
 
-Use Node.js 24 LTS and Yarn Classic 1.22.22:
+Use Node.js 24 LTS and the committed npm lockfile:
 
 ```sh
-npm install --global yarn@1.22.22 --ignore-scripts
-yarn install --frozen-lockfile --ignore-scripts
-npm run lint
+npm ci --ignore-scripts
+npm run check
 npm run build
+npx --no-install playwright install --with-deps chromium
+npm run test:coverage
 ```
+
+For watch mode, run `npm run start` in one terminal and `npm run test:watch` in another. The test command builds once before starting; the build watcher keeps the production-bundle test current after edits.
 
 The generated module is `dist/energy-overview-card.js`. To develop against a test Home Assistant instance, serve/copy that file as a dashboard JavaScript module and reload resources. Avoid loading the upstream module at the same time.
 
-The dependency/tooling migration and test coverage are tracked in issue #6. The inherited build is checked separately from real frontend behavior. There is no automated test/coverage claim at this stage.
+Vitest runs real Chromium tests for the card/editor, sensor handling, motion, loading and responsive layout. Home Assistant data and forms are mocked; these tests do not establish live frontend or HACS installation compatibility. V8 coverage is mapped to `src/` and exported to `coverage/lcov.info`. See [docs/compatibility.md](docs/compatibility.md) for the verification boundary.
 
 ## Validation
 
@@ -23,9 +26,11 @@ Preserve existing valid YAML and the public card type. For UI changes check enti
 
 ## Repository automation
 
-CI builds and lints the inherited source with a frozen lockfile. PRs also validate the HACS manifest, built artifact and module syntax locally. This is package validation, not proof that HACS can install the remote repository. CodeQL scans JavaScript/TypeScript; Dependabot covers npm and Actions. Metadata workflows label issues/PRs and validate titles without executing PR code. Stale issues are marked after 60 days and closed after another 14; PRs use 30 + 14 days. `keep-open`, security and high-priority items, milestones and draft PRs are exempt. Closing as stale does not mean fixed.
+CI uses `npm ci --ignore-scripts`, typechecks/lints/builds the card, runs Chromium tests with source coverage and audits runtime and development dependencies. PRs also validate the HACS manifest, built artifact and module syntax locally. This is package validation, not proof that HACS can install the remote repository. CodeQL scans JavaScript/TypeScript; Dependabot covers npm and Actions. Metadata workflows label issues/PRs and validate titles without executing PR code. Stale issues are marked after 60 days and closed after another 14; PRs use 30 + 14 days. `keep-open`, security and high-priority items, milestones and draft PRs are exempt. Closing as stale does not mean fixed.
 
-The connected SonarQube Cloud service reports automatic PR analysis. Meaningful LCOV coverage remains tracked in issue #6. Verify analysis for the final commit; a passing gate does not establish test coverage.
+The connected SonarQube Cloud service currently reports automatic PR analysis. Local/CI LCOV is available, but wiring that file into SonarQube requires switching the connected project to CI analysis; do not claim automatic analysis imported it. Verify analysis for the final commit; a passing gate alone does not establish coverage.
+
+`minimatch` is temporarily overridden to 11.0.1 to fix GHSA-g3hv-75wg-m249 in the lint toolchain. Remove the override when ESLint/typescript-eslint resolve a patched version themselves. Lint and browser tests must pass when changing the override.
 
 ## Releases
 

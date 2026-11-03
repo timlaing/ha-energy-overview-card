@@ -9,4 +9,4 @@ ci:
       - any-glob-to-any-file: ['.github/**']
 dependencies:
   - changed-files:
-      - any-glob-to-any-file: ['package.json', 'yarn.lock']
+      - any-glob-to-any-file: ['package.json', 'package-lock.json']

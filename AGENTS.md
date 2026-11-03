@@ -25,7 +25,7 @@ Preserve Sebastian Schneider's authorship acknowledgment, original MIT copyright
 
 ## Development
 
-Use Node 24 and Yarn 1.22.22. Run `yarn install --frozen-lockfile --ignore-scripts`, `npm run lint`, and `npm run build`. The inherited source has no automated test suite or coverage yet; issue #6 tracks this. Do not describe a build as runtime or browser verification.
+Use Node 24 and `npm ci --ignore-scripts` (one npm lockfile). Run `npm run check`, `npm run build` and `npm run test:coverage`. Install test Chromium with `npx --no-install playwright install --with-deps chromium` when needed. Browser tests use real Chromium with mocked Home Assistant data/form contracts; do not describe them as a live Home Assistant installation test. Coverage is written to `coverage/lcov.info`.
 
 ## Repository conventions
 
