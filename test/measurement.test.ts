@@ -56,6 +56,8 @@ describe('measurements and motion', () => {
     expect(animationFor(reading(500), { min_duration: 2, max_duration: 2 }).duration).toBe(2);
     expect(animationFor(reading(500), { min_duration: 5, max_duration: 1 }).duration).toBe(5);
     expect(animationFor(reading(Number.MAX_VALUE), { power: Number.MIN_VALUE }).duration).toBe(1);
+    expect(animationFor(reading(1000), { min_duration: Number.MIN_VALUE }).duration).toBe(0.001);
+    expect(animationFor(reading(500), { min_duration: Number.MAX_VALUE, max_duration: Number.MAX_VALUE }).duration).toBe(86400);
     expect(animationFor(reading(Number.MAX_VALUE, 'kW')).duration).toBeUndefined();
   });
 });

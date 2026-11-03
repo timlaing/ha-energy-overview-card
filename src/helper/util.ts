@@ -14,8 +14,7 @@ let loading: Promise<void> | undefined;
 /** Load HA's selector form via its card helpers, without requiring a dashboard button card. */
 export async function loadHaComponents(): Promise<void> {
   if (customElements.get('ha-form')) return;
-  if (!loading) {
-    loading = (async () => {
+  loading ??= (async () => {
       if (!window.loadCardHelpers) throw new Error('Home Assistant card helpers are unavailable.');
       const helpers = await window.loadCardHelpers();
       const card = helpers.createCardElement({ type: 'button' });
@@ -26,7 +25,6 @@ export async function loadHaComponents(): Promise<void> {
       await constructor.getConfigElement();
       if (!customElements.get('ha-form')) throw new Error('Home Assistant form did not load.');
     })();
-  }
   try {
     await loading;
   } catch (error) {

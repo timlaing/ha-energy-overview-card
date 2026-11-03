@@ -1,12 +1,10 @@
 // noinspection JSUnusedGlobalSymbols,CssInvalidHtmlTagReference
 
-import { html, LitElement, nothing } from "lit";
+import { html, LitElement, nothing, type TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import { TemplateResult } from "lit";
-import { fireEvent } from "./helper/util";
+import { capitalize, fireEvent } from "./helper/util";
 import type { HomeAssistant } from "./ha-types";
 import { ENTITY_EDITOR_NAME } from "./const";
-import { capitalize } from "./helper/util";
 import { EnergyOverviewEntity } from "./types";
 import { ANIMATION_SCHEMA, ENTITY_DATA_SCHEMA, ENTITY_VISUALS_SCHEMA } from "./schemas";
 
@@ -18,9 +16,9 @@ export class EnergyOverviewEntityEditor extends LitElement {
 
   @property({ attribute: false }) config?: EnergyOverviewEntity;
 
-  _computeLabel = (schema) => {
+  private readonly _computeLabel = (schema) => {
     if (schema.label) return schema.label;
-    let label = `${capitalize(schema.name.split('_').join(' '))}`;
+    let label = `${capitalize(schema.name.replaceAll('_', ' '))}`;
     if (schema.selector?.entity) label += ` ${this.hass!.localize(`ui.panel.lovelace.editor.card.generic.entity`)}`;
     return label;
   };

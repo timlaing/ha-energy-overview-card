@@ -2,7 +2,7 @@
 
 ## Development changes
 
-The compatibility branch replaces obsolete Polymer editor controls, awaits HA form loading through `window.loadCardHelpers()`, handles missing/unavailable measurements, bounds animation inputs, removes shared SVG path IDs and unsafe HTML construction, wraps narrow layouts and adds Masonry/Sections sizing. Existing card type, filename, options and CSS class hooks are retained. No fork release has been published.
+The compatibility branch replaces obsolete Polymer editor controls, awaits HA form loading through `window.loadCardHelpers()`, handles missing/unavailable measurements, bounds animation inputs (durations from 1 ms to one day to keep SMIL clock syntax valid), removes shared SVG path IDs and unsafe HTML construction, wraps narrow layouts and adds Masonry/Sections sizing. Existing card type, filename, options and CSS class hooks are retained. No fork release has been published.
 
 The frontend loading contract was checked against Home Assistant frontend **20260930.5** (`hui-button-card`, its editor, `ha-form` and card helpers). This is source verification, not a running frontend test. The matching stable Core baseline at investigation was **2026.10.4**. A beta has not been tested.
 

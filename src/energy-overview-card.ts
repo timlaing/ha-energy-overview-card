@@ -12,7 +12,7 @@ export class EnergyOverviewCard extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
   @state() private _config?: EnergyOverviewConfig;
 
-  static styles = css`
+  static readonly styles = css`
     :host { display: block; min-width: 0; container-type: inline-size; }
     ha-card { display: block; overflow: hidden; }
     .primary { font-weight: bold; font-size: 14px; color: var(--primary-text-color); }
@@ -98,8 +98,11 @@ export class EnergyOverviewCard extends LitElement {
   private _renderEntity(entity: EnergyOverviewEntityUI & { key: number }) {
     const animation = animationFor(entity.power, entity.animation);
     const pf = entity.power_factor;
+    const pfUnit = pf?.value === undefined ? '' : '%';
+    const className = `entity entity-${entity.key}`;
+    const colorStyle = `--energy-line-color: ${entity.color || 'var(--energy-grid-consumption-color, var(--primary-color, #03a9f4))'};`;
     return html`
-      <div class=${`entity entity-${entity.key}`} style=${`--energy-line-color: ${entity.color || 'var(--energy-grid-consumption-color, var(--primary-color, #03a9f4))'};`}>
+      <div class=${className} style=${colorStyle}>
         ${entity.name ? html`<span class="primary name">${entity.name}</span>` : nothing}
         <div class="metadata">
           ${entity.current || entity.voltage || entity.frequency ? html`
@@ -112,7 +115,7 @@ export class EnergyOverviewCard extends LitElement {
             <span class="secondary power">${entity.power.display}</span>&nbsp;<span class="secondary power-unit">${entity.power.unit}</span>
           </div>
           ${pf ? html`<div class="metadata-right">
-            <span class="secondary power-factor">${powerFactorDisplay(pf, this.hass!)}</span>&nbsp;<span class="secondary power-factor-unit">${pf.value === undefined ? '' : '%'}</span>
+            <span class="secondary power-factor">${powerFactorDisplay(pf, this.hass!)}</span>&nbsp;<span class="secondary power-factor-unit">${pfUnit}</span>
           </div>` : nothing}
         </div>
         <div class="main">
@@ -121,11 +124,7 @@ export class EnergyOverviewCard extends LitElement {
           <div class="line">
             <svg preserveAspectRatio="none" viewBox="0 0 100 10" aria-hidden="true">
               <path class="grid" d="M0,5 H100" vector-effect="non-scaling-stroke"></path>
-              ${animation.duration === undefined ? nothing : svg`
-                <circle class="grid" r="1" vector-effect="non-scaling-stroke">
-                  <animateMotion path="M0,5 H100" calcMode="linear" dur=${`${animation.duration}s`}
-                    keyPoints=${animation.inverted ? '1;0' : '0;1'} keyTimes="0;1" repeatCount="indefinite"></animateMotion>
-                </circle>`}
+              ${this._motion(animation)}
             </svg>
           </div>
           <div class="icon icon-trailing"><ha-icon .icon=${entity.icon_trailing || ICON_TRAILING_DEFAULT}></ha-icon></div>
@@ -135,8 +134,21 @@ export class EnergyOverviewCard extends LitElement {
     `;
   }
 
+  private _motion(animation: ReturnType<typeof animationFor>) {
+    if (animation.duration === undefined) return nothing;
+    const duration = `${animation.duration}s`;
+    const points = animation.inverted ? '1;0' : '0;1';
+    return svg`<circle class="grid" r="1" vector-effect="non-scaling-stroke">
+      <animateMotion path="M0,5 H100" calcMode="linear" dur=${duration}
+        keyPoints=${points} keyTimes="0;1" repeatCount="indefinite"></animateMotion>
+    </circle>`;
+  }
+
   private _measurement(value: EnergyOverviewEntityState | undefined, name: string) {
-    return value ? html`<div class="measurement"><span class=${`secondary ${name}`}>${value.display}</span>&nbsp;<span class=${`secondary ${name}-unit`}>${value.unit}</span></div>` : nothing;
+    if (!value) return nothing;
+    const valueClass = `secondary ${name}`;
+    const unitClass = `secondary ${name}-unit`;
+    return html`<div class="measurement"><span class=${valueClass}>${value.display}</span>&nbsp;<span class=${unitClass}>${value.unit}</span></div>`;
   }
 }
 

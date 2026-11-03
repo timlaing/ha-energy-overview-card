@@ -33,11 +33,13 @@ function positive(value: number | undefined, fallback: number): number {
 export function animationFor(power: EnergyOverviewEntityState, config?: EnergyOverviewAnimation): {
   duration: number | undefined; inverted: boolean;
 } {
-  const scale = power.unit === UnitOfPower.KILO_WATT ? 1000 : power.unit === UnitOfPower.BTU_PER_HOUR ? 0.29307107 : 1;
+  const scales: Record<string, number> = { [UnitOfPower.KILO_WATT]: 1000, [UnitOfPower.BTU_PER_HOUR]: 0.29307107 };
+  const scale = scales[power.unit] ?? 1;
   const watts = power.value === undefined ? undefined : power.value * scale;
   if (watts === undefined || !Number.isFinite(watts) || watts === 0) return { duration: undefined, inverted: false };
-  const min = positive(config?.min_duration, 1);
-  const max = Math.max(min, positive(config?.max_duration, 10));
+  // SMIL clock values cannot use the scientific notation JS emits for extremes.
+  const min = clamp(positive(config?.min_duration, 1), 0.001, 86400);
+  const max = Math.max(min, clamp(positive(config?.max_duration, 10), 0.001, 86400));
   const threshold = positive(config?.power, 1000);
   // Divide before multiplying to avoid overflow for finite high power readings.
   const ratio = Math.min(Math.abs(watts) / threshold, 1);

@@ -16,7 +16,7 @@ export class EnergyOverviewCardEditor extends LitElement {
   @state() private _ready = false;
   @state() private _loadFailed = false;
 
-  static styles = css`
+  static readonly styles = css`
     :host { display: block; color: var(--primary-text-color); }
     .toolbar, .entity-list, .card-options { display: flex; gap: 4px; align-items: center; }
     .entity-list { flex: 1; min-width: 0; overflow-x: auto; }
@@ -63,7 +63,7 @@ export class EnergyOverviewCardEditor extends LitElement {
 
   private _handleConfigChanged(ev: CustomEvent<{ config: EnergyOverviewEntity }>): void {
     ev.stopPropagation();
-    if (!this._config || !this._config.entities[this._selectedCard]) return;
+    if (!this._config?.entities[this._selectedCard]) return;
     const entities = [...this._config.entities];
     entities[this._selectedCard] = ev.detail.config;
     this._publish({ ...this._config, entities });
@@ -77,7 +77,7 @@ export class EnergyOverviewCardEditor extends LitElement {
   }
 
   private _deleteEntity(): void {
-    if (!this._config || !this._config.entities.length) return;
+    if (!this._config?.entities.length) return;
     const entities = [...this._config.entities];
     entities.splice(this._selectedCard, 1);
     this._selectedCard = Math.max(0, this._selectedCard - 1);
@@ -109,7 +109,7 @@ export class EnergyOverviewCardEditor extends LitElement {
     this.renderRoot.querySelectorAll<HTMLButtonElement>('.entity-select')[selected]?.focus();
   }
 
-  private _computeLabel = (schema: any): string => schema.label || capitalize(schema.name.split('_').join(' '));
+  private readonly _computeLabel = (schema: any): string => schema.label || capitalize(schema.name.replaceAll('_', ' '));
 
   private _valueChanged(ev: CustomEvent<{ value: Partial<EnergyOverviewConfig> }>): void {
     ev.stopPropagation();

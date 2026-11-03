@@ -23,7 +23,7 @@ export const getDefaultFormatOptions = (
     || (options.minimumFractionDigits === undefined
       && options.maximumFractionDigits === undefined)
   ) {
-    const match = num.trim().match(/^[+-]?\d*(?:\.(\d*))?(?:e([+-]?\d+))?$/i);
+    const match = /^[+-]?\d*(?:\.(\d*))?(?:e([+-]?\d+))?$/i.exec(num.trim());
     const digits = Math.min(20, Math.max(0, (match?.[1]?.length ?? 0) - Number(match?.[2] ?? 0)));
     defaultOptions.minimumFractionDigits = digits;
     defaultOptions.maximumFractionDigits = digits;
