@@ -1,7 +1,7 @@
 name: Release asset
 on:
   release:
-    types: [published]
+    types: [published, released]
 permissions:
   contents: read
 concurrency:
@@ -10,6 +10,10 @@ concurrency:
 jobs:
   release:
     name: Build release asset
+    # Stable publications emit both events. Build them only on released;
+    # published also covers prereleases, including those published from drafts.
+    # Promoting a prerelease emits released and rebuilds the tagged asset.
+    if: github.event.action == 'released' || (github.event.action == 'published' && github.event.release.prerelease)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -43,6 +47,8 @@ jobs:
   validate-hacs:
     name: HACS release validation
     needs: release
+    # The pinned HACS validator excludes prerelease assets (show_beta=false).
+    if: github.event.release.prerelease == false
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
