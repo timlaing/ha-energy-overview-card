@@ -109,6 +109,11 @@ export class EnergyOverviewCardEditor extends LitElement {
     this.renderRoot.querySelectorAll<HTMLButtonElement>('.entity-select')[selected]?.focus();
   }
 
+  private _label(key: string, fallback: string): string {
+    const translated = this.hass?.localize(key);
+    return translated && translated !== key ? translated : fallback;
+  }
+
   private readonly _computeLabel = (schema: any): string => schema.label || capitalize(schema.name.replaceAll('_', ' '));
 
   private _valueChanged(ev: CustomEvent<{ value: Partial<EnergyOverviewConfig> }>): void {
@@ -123,28 +128,28 @@ export class EnergyOverviewCardEditor extends LitElement {
 
   render() {
     if (!this.hass || !this._config) return nothing;
-    if (this._loadFailed) return html`<p class="error" role="alert">Unable to load the Home Assistant editor. Use YAML or retry.</p><button type="button" @click=${this._loadEditor}>Retry</button>`;
+    if (this._loadFailed) return html`<p class="error" role="alert">Unable to load the Home Assistant editor. Use YAML or retry.</p><button type="button" @click=${this._loadEditor}>${this._label('ui.panel.app.retry', 'Retry')}</button>`;
     if (!this._ready) return html`<p role="status">Loading editor…</p>`;
     const selected = this._selectedCard;
     const count = this._config.entities.length;
     return html`
       <h2>Entities</h2>
       <div class="toolbar">
-        <div class="entity-list" role="group" aria-label="Select an entity" @keydown=${this._navigate}>
+        <div class="entity-list" role="group" aria-label=${this._label('ui.panel.lovelace.editor.card.entities.name', 'Entities')} @keydown=${this._navigate}>
           ${this._config.entities.map((_entity, index) => html`
-            <button type="button" class="entity-select" aria-label=${`Entity ${index + 1}`}
+            <button type="button" class="entity-select" aria-label=${`${this._label('ui.panel.lovelace.editor.card.generic.entity', 'Entity')} ${index + 1}`}
               aria-pressed=${index === selected ? 'true' : 'false'}
               @click=${() => { this._selectedCard = index; }}>${index + 1}</button>
           `)}
         </div>
-        <button type="button" id="add-card" @click=${this._addEntity}>Add entity</button>
+        <button type="button" id="add-card" @click=${this._addEntity}>${this._label('ui.panel.lovelace.editor.entities.add', 'Add entity')}</button>
       </div>
       <div id="editor">
         ${count ? html`
           <div class="card-options">
-            <button type="button" aria-label="Move entity before" ?disabled=${selected === 0} @click=${() => this._moveEntity(-1)}>←</button>
-            <button type="button" aria-label="Move entity after" ?disabled=${selected === count - 1} @click=${() => this._moveEntity(1)}>→</button>
-            <button type="button" aria-label="Delete entity" @click=${this._deleteEntity}>Delete</button>
+            <button type="button" aria-label=${this._label('ui.panel.lovelace.editor.edit_card.move_before', 'Move entity before')} ?disabled=${selected === 0} @click=${() => this._moveEntity(-1)}>←</button>
+            <button type="button" aria-label=${this._label('ui.panel.lovelace.editor.edit_card.move_after', 'Move entity after')} ?disabled=${selected === count - 1} @click=${() => this._moveEntity(1)}>→</button>
+            <button type="button" aria-label=${this._label('ui.panel.lovelace.editor.edit_card.delete', 'Delete entity')} @click=${this._deleteEntity}>${this._label('ui.panel.lovelace.editor.edit_card.delete', 'Delete entity')}</button>
           </div>
           <energy-overview-entity-editor .hass=${this.hass} .config=${this._config.entities[selected]}
             .lovelace=${this.lovelace} @config-changed=${this._handleConfigChanged}></energy-overview-entity-editor>

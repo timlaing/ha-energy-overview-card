@@ -28,6 +28,8 @@ describe('measurements and motion', () => {
     const context = { ...hass, entities: { 'sensor.pf': { display_precision: 4 } }, states: { 'sensor.pf': { state: '0.9567', attributes: {} } } };
     expect(powerFactorDisplay(readMeasurement(context, 'sensor.pf', '')!, context)).toBe('95.67');
     expect(powerFactorDisplay(reading(95, '%'), hass)).toBe('95');
+    const unregistered = { ...hass, entities: {}, states: { 'sensor.pf': { state: '0.9567', attributes: {} } } };
+    expect(powerFactorDisplay(readMeasurement(unregistered, 'sensor.pf', '')!, unregistered)).toBe('96');
     expect(powerFactorDisplay(reading(undefined, ''), hass)).toBe('undefined');
     context.entities['sensor.pf'].display_precision = -1;
     expect(readMeasurement(context, 'sensor.pf', '')?.display).toBe('0.9567');
@@ -41,9 +43,20 @@ describe('measurements and motion', () => {
     expect(() => formatNumber(`1.${'0'.repeat(1000)}`, hass.locale)).not.toThrow();
     expect(formatNumber('1234.50', { language: 'en', number_format: 'quote_decimal' })).toMatch(/^1['’]234\.50$/);
   });
+  it('preserves tiny signed readings in display and motion', () => {
+    for (const state of ['1e-21', '-1e-21', '0.000000000000000000001']) {
+      const context = { ...hass, states: { 'sensor.power': { state, attributes: {} } } };
+      const measurement = readMeasurement(context, 'sensor.power', 'W', true)!;
+      expect(Number(measurement.display)).toBe(Number(state));
+      expect(animationFor(measurement).duration).toBe(10);
+      expect(animationFor(measurement).inverted).toBe(Number(state) < 0);
+    }
+  });
   it('normalizes W/kW/BTU power and stops at zero', () => {
     expect(animationFor(reading(500)).duration).toBe(5.5);
     expect(animationFor(reading(0.5, 'kW')).duration).toBe(5.5);
+    expect(animationFor(reading(500000, 'mW')).duration).toBe(5.5);
+    expect(animationFor(reading(1, 'MW')).duration).toBe(1);
     expect(animationFor(reading(1000, 'BTU/h')).duration).toBeCloseTo(7.36236);
     expect(animationFor(reading(0)).duration).toBeUndefined();
     expect(animationFor(reading(5000)).duration).toBe(1);

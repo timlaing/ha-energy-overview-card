@@ -1,11 +1,20 @@
 import { expect, it, vi } from 'vitest';
-import { loadHaComponents } from '../src/helper/util';
+import { EDITOR_LOAD_TIMEOUT_MS, loadHaComponents } from '../src/helper/util';
 
 it('reports failures, retries and awaits the shared cold-start form loader', async () => {
   delete window.loadCardHelpers;
   await expect(loadHaComponents()).rejects.toThrow('helpers are unavailable');
   window.loadCardHelpers = vi.fn(async () => { throw new Error('Network failure'); });
   await expect(loadHaComponents()).rejects.toThrow('Network failure');
+  vi.useFakeTimers();
+  try {
+    window.loadCardHelpers = () => new Promise(() => {});
+    const timedOut = expect(loadHaComponents()).rejects.toThrow('timed out');
+    await vi.advanceTimersByTimeAsync(EDITOR_LOAD_TIMEOUT_MS);
+    await timedOut;
+  } finally {
+    vi.useRealTimers();
+  }
   let finish: () => void = () => {};
   const loaded = new Promise<void>((resolve) => { finish = resolve; });
   class ButtonCard extends HTMLElement {

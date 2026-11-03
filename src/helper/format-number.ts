@@ -13,6 +13,12 @@ export const getDefaultFormatOptions = (
     ...options,
   };
 
+  const numeric = Number(num);
+  const hasPrecision = options?.minimumFractionDigits !== undefined || options?.maximumFractionDigits !== undefined;
+  if (!hasPrecision && numeric !== 0 && Math.abs(numeric) < 1e-20) {
+    return { notation: 'scientific', maximumFractionDigits: 5, ...options };
+  }
+
   if (typeof num !== "string") {
     return defaultOptions;
   }

@@ -57,6 +57,9 @@ it.each([180, 320, 768, 1280])('does not overflow a %s px card with long labels 
     expect(bounds.left).toBeGreaterThanOrEqual(box.left - 1);
     expect(bounds.right).toBeLessThanOrEqual(box.right + 1);
   }
+  for (const text of element.shadowRoot!.querySelectorAll<HTMLElement>('.name, .label')) {
+    expect(text.scrollWidth).toBeLessThanOrEqual(text.clientWidth + 1);
+  }
 });
 it('supports empty previews, validates shape, and sizes title/rows without clipping Sections', async () => {
   const element = await card([]);

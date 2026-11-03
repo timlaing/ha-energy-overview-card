@@ -9,7 +9,7 @@ Maintained by [Tim Laing (@timlaing)](https://github.com/timlaing). This fork co
 
 ## Compatibility
 
-This fork starts from upstream v2.5.0. Compatibility with current Home Assistant releases is being restored and has not yet been verified. The editor, unavailable-state handling, responsive layout and sizing have regression fixes in development. See [the compatibility issues](https://github.com/timlaing/ha-energy-overview-card/issues) and [release verification tracker #7](https://github.com/timlaing/ha-energy-overview-card/issues/7).
+This fork starts from upstream v2.5.0. The development module has passed isolated browser checks on Home Assistant Core 2026.10.4 and 2026.11.0b4. The editor, unavailable-state handling, responsive layout and sizing have regression fixes in development; HACS release installation and physical-device checks are still outstanding. See [the compatibility issues](https://github.com/timlaing/ha-energy-overview-card/issues) and [release verification tracker #7](https://github.com/timlaing/ha-energy-overview-card/issues/7).
 
 Existing `custom:energy-overview-card` YAML and the `energy-overview-card.js` filename are retained. See [verification details](docs/compatibility.md) before treating these development changes as release-ready.
 

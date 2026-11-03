@@ -5,6 +5,8 @@
 - Remove shared SVG path IDs and unsafe HTML construction, improve narrow layouts and add dashboard sizing metadata.
 - Replace the legacy toolchain with Lit 3, esbuild, current TypeScript/ESLint and a reproducible npm lockfile.
 - Add Chromium source/production-module regressions, source-mapped coverage and dependency auditing.
+- Restore native-control translations, bound stalled editor loading, preserve tiny reading magnitudes, support mW/MW and repair watch-mode setup.
+- Verify the development module in isolated stable and beta Home Assistant frontends; see docs/compatibility.md for the limits.
 
 Live Home Assistant and HACS release installation verification is still tracked in issue #7. Historical upstream release entries follow unchanged.
 

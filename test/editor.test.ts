@@ -3,6 +3,9 @@ import { EnergyOverviewCardEditor } from '../src/energy-overview-card-editor';
 import type { EnergyOverviewConfig } from '../src/types';
 import { EnergyOverviewEntityEditor } from '../src/energy-overview-entity-editor';
 import { userEvent } from 'vitest/browser';
+import { ANIMATION_SCHEMA, ENTITY_DATA_SCHEMA, ENTITY_VISUALS_SCHEMA, TITLE_SCHEMA, ORDER_BY_SCHEMA } from '../src/schemas';
+type Form = HTMLElement & { schema: unknown };
+
 
 beforeAll(() => {
   customElements.define('ha-form', class extends HTMLElement {});
@@ -54,11 +57,14 @@ it('retains global and per-entity settings during edits, then reopens saved conf
   element.addEventListener('config-changed', (event) => { latest = (event as CustomEvent).detail.config; });
   const child = element.shadowRoot!.querySelector<EnergyOverviewEntityEditor>('energy-overview-entity-editor')!;
   await child.updateComplete;
+  const childForms = child.shadowRoot!.querySelectorAll<Form>('ha-form');
+  expect([...childForms].map((form) => form.schema)).toEqual([ENTITY_DATA_SCHEMA, ENTITY_VISUALS_SCHEMA, ANIMATION_SCHEMA]);
   change(child.shadowRoot!.querySelector('ha-form')!, { power: 'sensor.changed' });
   change(child.shadowRoot!.querySelectorAll('ha-form')[2] as HTMLElement, { inverted: false, power: 300 });
   await element.updateComplete;
   expect(latest.entities[0]).toEqual({ ...initial.entities[0], power: 'sensor.changed', animation: { inverted: false, power: 300 } });
-  const forms = element.shadowRoot!.querySelectorAll<HTMLElement>('ha-form');
+  const forms = element.shadowRoot!.querySelectorAll<Form>('ha-form');
+  expect([...forms].map((form) => form.schema)).toEqual([TITLE_SCHEMA, ORDER_BY_SCHEMA, ANIMATION_SCHEMA]);
   change(forms[0], { title: 'New title' });
   change(forms[1], { order_by: 'power' });
   expect(latest.title).toBe('New title');
@@ -76,6 +82,11 @@ it('supports keyboard selection and clamps selection when YAML removes rows', as
   await element.updateComplete;
   expect(element.shadowRoot!.activeElement?.getAttribute('aria-label')).toBe('Entity 2');
   expect(element.shadowRoot!.querySelector('[aria-label="Entity 2"]')?.getAttribute('aria-pressed')).toBe('true');
+  for (const [key, expected] of [['ArrowRight', 'Entity 1'], ['End', 'Entity 2'], ['Home', 'Entity 1'], ['ArrowLeft', 'Entity 2']]) {
+    await userEvent.keyboard(`{${key}}`);
+    await element.updateComplete;
+    expect(element.shadowRoot!.activeElement?.getAttribute('aria-label')).toBe(expected);
+  }
   element.setConfig({ ...initial, entities: [initial.entities[0]] });
   await element.updateComplete;
   expect(element.shadowRoot!.querySelector('[aria-label="Entity 1"]')?.getAttribute('aria-pressed')).toBe('true');
@@ -89,4 +100,22 @@ it('keeps touch controls usable and within narrow editor bounds', async () => {
   }
   const right = element.getBoundingClientRect().right;
   expect(element.shadowRoot!.querySelector('.toolbar')!.getBoundingClientRect().right).toBeLessThanOrEqual(right);
+});
+
+it('uses Home Assistant translations for native controls and accessible entity labels', async () => {
+  const element = await editor();
+  const translations: Record<string, string> = {
+    'ui.panel.lovelace.editor.entities.add': 'Entität hinzufügen',
+    'ui.panel.lovelace.editor.edit_card.move_before': 'Nach vorne',
+    'ui.panel.lovelace.editor.edit_card.move_after': 'Nach hinten',
+    'ui.panel.lovelace.editor.edit_card.delete': 'Löschen',
+    'ui.panel.lovelace.editor.card.generic.entity': 'Entität',
+  };
+  element.hass = { ...element.hass!, localize: (key) => translations[key] ?? '' };
+  await element.updateComplete;
+  expect(element.shadowRoot!.querySelector('#add-card')?.textContent).toBe('Entität hinzufügen');
+  expect(element.shadowRoot!.querySelector('[aria-label="Nach vorne"]')).not.toBeNull();
+  expect(element.shadowRoot!.querySelector('[aria-label="Nach hinten"]')).not.toBeNull();
+  expect(element.shadowRoot!.querySelector('[aria-label="Löschen"]')?.textContent).toBe('Löschen');
+  expect(element.shadowRoot!.querySelector('[aria-label="Entität 1"]')).not.toBeNull();
 });

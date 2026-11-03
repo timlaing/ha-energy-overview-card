@@ -33,7 +33,7 @@ function positive(value: number | undefined, fallback: number): number {
 export function animationFor(power: EnergyOverviewEntityState, config?: EnergyOverviewAnimation): {
   duration: number | undefined; inverted: boolean;
 } {
-  const scales: Record<string, number> = { [UnitOfPower.KILO_WATT]: 1000, [UnitOfPower.BTU_PER_HOUR]: 0.29307107 };
+  const scales: Record<string, number> = { [UnitOfPower.MILLIWATT]: 0.001, [UnitOfPower.KILO_WATT]: 1000, [UnitOfPower.MEGA_WATT]: 1000000, [UnitOfPower.BTU_PER_HOUR]: 0.29307107 };
   const scale = scales[power.unit] ?? 1;
   const watts = power.value === undefined ? undefined : power.value * scale;
   if (watts === undefined || !Number.isFinite(watts) || watts === 0) return { duration: undefined, inverted: false };

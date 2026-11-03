@@ -10,9 +10,11 @@ Use Node.js 24 LTS and the committed npm lockfile:
 npm ci --ignore-scripts
 npm run check
 npm run build
-npx --no-install playwright install chromium
+npx --no-install playwright install --with-deps chromium
 npm run test:coverage
 ```
+
+For watch mode, run `npm run start` in one terminal and `npm run test:watch` in another. The test command builds once before starting; the build watcher keeps the production-bundle test current after edits.
 
 The generated module is `dist/energy-overview-card.js`. To develop against a test Home Assistant instance, serve/copy that file as a dashboard JavaScript module and reload resources. Avoid loading the upstream module at the same time.
 
