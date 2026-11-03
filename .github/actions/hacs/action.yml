@@ -7,6 +7,9 @@ inputs:
   category:
     description: HACS repository category.
     required: true
+  repository:
+    description: Full name of the repository to validate.
+    required: false
   ignore:
     description: Space-separated HACS checks to ignore.
     default: ''
