@@ -95,6 +95,7 @@ it.each([320, 768, 1280])('moves across the full flow line at %s px and reverses
     const bounds = circle.getBoundingClientRect();
     return bounds.left + bounds.width / 2;
   };
+  await expect.poll(() => circle.getAnimations().length).toBe(1);
   const animation = circle.getAnimations()[0];
   expect(animation).toBeDefined();
   // First prove the clock is running, then sample exact positions without timing races.
@@ -107,6 +108,7 @@ it.each([320, 768, 1280])('moves across the full flow line at %s px and reverses
   expect(center()).toBeCloseTo(bounds.left + bounds.width * 0.75, 0);
   element.hass = { ...hass, states: { 'sensor.power': { state: '-500', attributes: {} } } };
   await element.updateComplete;
+  await expect.poll(() => circle.getAnimations().length).toBe(1);
   const reversed = circle.getAnimations()[0];
   reversed.pause();
   reversed.currentTime = 1375;
@@ -116,7 +118,7 @@ it.each([320, 768, 1280])('moves across the full flow line at %s px and reverses
   expect(element.shadowRoot!.querySelector('circle')).toBeNull();
   element.hass = hass;
   await element.updateComplete;
-  expect(element.shadowRoot!.querySelector('circle')!.getAnimations()).toHaveLength(1);
+  await expect.poll(() => element.shadowRoot!.querySelector('circle')!.getAnimations().length).toBe(1);
 });
 it('supports empty previews, validates shape, and sizes title/rows without clipping Sections', async () => {
   const element = await card([]);
