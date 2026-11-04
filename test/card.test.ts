@@ -1,4 +1,4 @@
-import { afterEach, expect, it } from 'vitest';
+import { afterEach, beforeEach, expect, it } from 'vitest';
 import { commands } from 'vitest/browser';
 import { EnergyOverviewCard } from '../src/energy-overview-card';
 import type { HomeAssistant } from '../src/ha-types';
@@ -13,6 +13,11 @@ const hass: HomeAssistant = {
   states: { 'sensor.power': { state: '500', attributes: { unit_of_measurement: 'W' } } },
   locale: { language: 'en' }, localize: () => '',
 };
+beforeEach(async () => {
+  // A null preference restores platform defaults, which can reduce motion in Linux WebKit.
+  await commands.setReducedMotion('no-preference');
+  await expect.poll(() => matchMedia('(prefers-reduced-motion: reduce)').matches).toBe(false);
+});
 afterEach(() => { document.body.replaceChildren(); });
 async function card(entities: any[] = [{ power: 'sensor.power' }]) {
   const element = new EnergyOverviewCard();
@@ -69,7 +74,7 @@ it('hides the flow dot and removes its animation when reduced motion is enabled'
     await expect.poll(() => getComputedStyle(circle).display).not.toBe('none');
     await expect.poll(() => circle.getAnimations()[0]?.playState).toBe('running');
   } finally {
-    await commands.setReducedMotion(null);
+    await commands.setReducedMotion('no-preference');
   }
 });
 it.each([180, 320, 768, 1280])('does not overflow a %s px card with long labels and optional metadata', async (width) => {
