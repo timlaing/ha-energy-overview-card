@@ -136,6 +136,11 @@ export class EnergyOverviewCard extends LitElement {
     `;
   }
 
+  /**
+   * Returns the flow dot with a cycle duration in seconds and the supplied direction.
+   * An undefined duration returns Lit's `nothing`; an inverted direction reverses the dot.
+   * The card hides the dot when reduced motion is preferred.
+   */
   private _motion(animation: ReturnType<typeof animationFor>) {
     if (animation.duration === undefined) return nothing;
     const duration = `${animation.duration}s`;
