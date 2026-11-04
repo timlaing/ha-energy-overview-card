@@ -136,6 +136,11 @@ export class EnergyOverviewCard extends LitElement {
     `;
   }
 
+  /**
+   * Returns a flow dot template, or nothing when duration is undefined (for
+   * example, for zero or unavailable power). Duration is in seconds and
+   * inverted reverses the direction. Reduced motion hides the dot.
+   */
   private _motion(animation: ReturnType<typeof animationFor>) {
     if (animation.duration === undefined) return nothing;
     const duration = `${animation.duration}s`;
