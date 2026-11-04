@@ -34,7 +34,7 @@
     "check": "npm run lint && npm run typecheck",
     "lint": "eslint src scripts test vitest.config.ts",
     "typecheck": "tsc --noEmit",
-    "test": "npm run build && vitest run",
+    "test": "npm run build && vitest run && vitest run --mode webkit",
     "test:coverage": "npm run build && vitest run --coverage",
     "test:watch": "npm run build && vitest"
   },

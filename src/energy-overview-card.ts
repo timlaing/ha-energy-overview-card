@@ -30,7 +30,9 @@ export class EnergyOverviewCard extends LitElement {
     .line { flex: 1 1 0; min-width: 0; height: 15px; margin: 0 8px; }
     .line svg { display: block; width: 100%; height: 15px; }
     .line path { stroke-width: 1; fill: none; stroke: var(--energy-line-color); }
-    .line circle { stroke-width: 4; stroke: var(--energy-line-color); fill: var(--energy-line-color); }
+    .line circle { stroke-width: 4; stroke: var(--energy-line-color); fill: var(--energy-line-color); animation: energy-flow var(--flow-duration) linear infinite; animation-direction: var(--flow-direction); }
+    /* SVG user units track the viewBox, independent of the rendered card width. */
+    @keyframes energy-flow { from { transform: translateX(0px); } to { transform: translateX(100px); } }
     @container (max-width: 360px) {
       .main { display: grid; grid-template-columns: 24px minmax(0, 1fr) 24px; gap: 4px; }
       .label { max-width: none; margin: 0; }
@@ -41,7 +43,7 @@ export class EnergyOverviewCard extends LitElement {
       .line { grid-column: 2; grid-row: 2; margin: 0; }
       .icon-trailing { grid-column: 3; grid-row: 2; }
     }
-    @media (prefers-reduced-motion: reduce) { .line circle { display: none; } }
+    @media (prefers-reduced-motion: reduce) { .line circle { display: none; animation: none; } }
   `;
 
   public static getStubConfig(): Record<string, unknown> {
@@ -134,14 +136,18 @@ export class EnergyOverviewCard extends LitElement {
     `;
   }
 
+  /**
+   * Returns the flow dot with a cycle duration in seconds and the supplied direction.
+   * An undefined duration returns Lit's `nothing`; an inverted direction reverses the dot.
+   * The card hides the dot when reduced motion is preferred.
+   */
   private _motion(animation: ReturnType<typeof animationFor>) {
     if (animation.duration === undefined) return nothing;
     const duration = `${animation.duration}s`;
-    const points = animation.inverted ? '1;0' : '0;1';
-    return svg`<circle class="grid" r="1" vector-effect="non-scaling-stroke">
-      <animateMotion path="M0,5 H100" calcMode="linear" dur=${duration}
-        keyPoints=${points} keyTimes="0;1" repeatCount="indefinite"></animateMotion>
-    </circle>`;
+    const direction = animation.inverted ? 'reverse' : 'normal';
+    const motionStyle = `--flow-duration: ${duration}; --flow-direction: ${direction};`;
+    return svg`<circle class="grid" cx="0" cy="5" r="1" vector-effect="non-scaling-stroke"
+      style=${motionStyle}></circle>`;
   }
 
   private _measurement(value: EnergyOverviewEntityState | undefined, name: string) {

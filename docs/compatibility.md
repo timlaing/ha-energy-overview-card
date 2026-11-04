@@ -1,5 +1,26 @@
 # Compatibility verification
 
+## Mobile animation follow-up (#10)
+
+The development bundle now uses CSS transform keyframes instead of SVG SMIL.
+Automated Chromium and Playwright WebKit checks verify actual dot positions at
+320/768/1280 px, forward/reverse flow, zero-power removal and restart, independent
+instances, and motion in the production bundle. `npm test` runs both engines;
+`npm run test:coverage` retains Chromium-only V8 coverage. Install browsers using
+`npx --no-install playwright install --with-deps chromium webkit`.
+
+These are desktop browser engines, not physical iOS/Android tests. The reported
+mobile failure has not been reproduced on a device, so its root cause remains
+unconfirmed. SMIL is supported by modern browsers; prior claims of Chrome SMIL
+deprecation or confirmed power-saving/container-query causes were not established.
+Reduced Motion intentionally hides the dot and remains respected.
+
+For device verification, load the new development `dist/energy-overview-card.js`
+instead of the v3.0.0 release asset, refresh cached dashboard resources, and check
+nonzero positive/negative power, zero/unavailable power, multiple cards, scrolling,
+background/foreground return, and Reduce Motion on/off. Do not install both bundles
+at once (they register the same custom element). Record browser/OS/app versions.
+
 ## Development changes
 
 The compatibility branch replaces obsolete Polymer editor controls, awaits HA form loading through `window.loadCardHelpers()`, handles missing/unavailable measurements, bounds animation inputs (durations from 1 ms to one day to keep SMIL clock syntax valid), removes shared SVG path IDs and unsafe HTML construction, wraps narrow layouts and adds Masonry/Sections sizing. Existing card type, filename, options and common entity/measurement CSS class hooks are retained. No fork release has been published.
@@ -14,10 +35,10 @@ The production ES module is separately built and checked for HACS manifest/asset
 
 The built module was manually installed under `www/` in two independent, temporary, localhost-only Home Assistant containers. Each had synthetic sensors and a fresh browser/test account. No existing Home Assistant deployment or dashboard was used or changed.
 
-| Core | Frontend package | Result |
-| --- | --- | --- |
-| 2026.10.4 | 20260930.5 | Passed the checks below |
-| 2026.11.0b4 | 20261028.3 | Passed the checks below |
+| Core        | Frontend package | Result                  |
+| ----------- | ---------------- | ----------------------- |
+| 2026.10.4   | 20260930.5       | Passed the checks below |
+| 2026.11.0b4 | 20261028.3       | Passed the checks below |
 
 The subsequent build-only review fix prepends the full MIT license notice. Removing that comment yields the identical module hash recorded below; no executable code changed.
 

@@ -2,6 +2,10 @@
 
 A Home Assistant dashboard card for live power, voltage, current, frequency and power factor, with animated power flow.
 
+Flow animation stops for zero or unavailable power. It also respects your device's
+**Reduce Motion** accessibility setting: when enabled, the moving dot is hidden.
+If motion is missing on a phone, check that setting and the sensor reading first.
+
 Maintained by [Tim Laing (@timlaing)](https://github.com/timlaing). This fork continues the original work by [Sebastian Schneider (@Sese-Schneider)](https://github.com/Sese-Schneider/ha-energy-overview-card). Thank you to Sebastian for creating the card and making it available under the MIT license. Original history, copyright and release notes are retained.
 
 [![CI](https://github.com/timlaing/ha-energy-overview-card/actions/workflows/ci.yml/badge.svg)](https://github.com/timlaing/ha-energy-overview-card/actions/workflows/ci.yml)
